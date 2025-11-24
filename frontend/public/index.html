@@ -1,0 +1,1352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Income Tax Relief • Zama FHEVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Required for Relayer SDK (WASM/Workers) -->
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+  <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
+
+  <style>
+    :root {
+      --page-bg: #f5f2ff;
+      --page-bg-2: #fdfbff;
+      --card-bg: #ffffff;
+      --card-border: #d8d5f3;
+      --accent: #4d46e8;
+      --accent-soft: #e3e1ff;
+      --accent-soft2: #f0f3ff;
+      --danger: #e54b4b;
+      --success: #1b9360;
+      --ink: #161421;
+      --muted: #6b6a86;
+      --input-bg: #f7f7ff;
+      --shadow-soft: 0 16px 40px rgba(34, 22, 88, 0.12);
+      --radius-xl: 22px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+    }
+
+    body {
+      background:
+        radial-gradient(120% 120% at 0% 0%, #f0f4ff 0, transparent 60%),
+        radial-gradient(120% 160% at 100% 0%, #fbe9ff 0, transparent 70%),
+        linear-gradient(180deg, var(--page-bg) 0, var(--page-bg-2) 40%, #f7f5ff 100%);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1120px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 14px 40px rgba(136, 122, 255, 0.18);
+      backdrop-filter: blur(16px);
+      border: 1px solid #e0ddff;
+    }
+
+    .logo-marker {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background:
+        conic-gradient(from 130deg, #4d46e8, #a855f7, #06b6d4, #4d46e8);
+      position: relative;
+    }
+    .logo-marker::after {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: inherit;
+      background: #f9f7ff;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.03em;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #f0f3ff;
+      color: #424167;
+      border: 1px solid #d7d9ff;
+      font-weight: 600;
+    }
+    .pill span.mono { font-family: ui-monospace, Menlo, Consolas, "SF Mono"; }
+
+    .btn {
+      min-height: 38px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid #d1cff8;
+      background: #ffffff;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(100, 83, 255, 0.12);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 40px rgba(100, 83, 255, 0.18);
+      background: #fdfbff;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #4d46e8, #6366f1);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 16px 40px rgba(79, 70, 229, 0.5);
+    }
+    .btn.primary:hover {
+      background: linear-gradient(135deg, #4338ca, #4f46e5);
+    }
+    .btn.small {
+      min-height: 30px;
+      font-size: 12px;
+      padding-inline: 10px;
+      box-shadow: none;
+    }
+    .btn[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 16px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #3b3a60;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a496e;
+    }
+
+    .field-label span.badge {
+      margin-left: 6px;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .input-shell {
+      display: flex;
+      align-items: center;
+      border-radius: var(--radius-md);
+      border: 1px solid #d7d4f2;
+      background: var(--input-bg);
+      padding: 0 10px;
+    }
+
+    .input-shell span.unit {
+      font-size: 12px;
+      color: var(--muted);
+      margin-inline: 6px;
+      white-space: nowrap;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      border: none;
+      outline: none;
+      flex: 1;
+      padding: 10px 4px;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      font-family: inherit;
+    }
+
+    input::placeholder {
+      color: #b4b2d1;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid #e1def7;
+      background: #f6f5ff;
+      color: #56527e;
+    }
+
+    .eligibility-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid #e0ddff;
+      background: #f8f7ff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #d4d4f7;
+    }
+    .status-dot.ok {
+      background: radial-gradient(circle at 30% 30%, #bbf7d0, #16a34a);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    }
+    .status-dot.no {
+      background: radial-gradient(circle at 30% 30%, #fecaca, #b91c1c);
+      box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.18);
+    }
+    .status-dot.pending {
+      background: radial-gradient(circle at 30% 30%, #fef08a, #eab308);
+      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.18);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "SF Mono", monospace;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 12px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #e4e2fb 15%,
+        #e4e2fb 85%,
+        transparent
+      );
+      margin: 8px 0 10px;
+    }
+
+    .stack-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .handle-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .handle-box {
+      border-radius: var(--radius-md);
+      border: 1px dashed #d7d4f2;
+      background: #faf9ff;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #4a496e;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .handle-placeholder {
+      color: #b0afd1;
+      font-style: italic;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: #8886ab;
+      padding-top: 4px;
+    }
+
+    .log-card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 18px;
+      border: 1px solid #ddd9fb;
+      padding: 10px 14px 8px;
+      box-shadow: 0 10px 30px rgba(73, 63, 160, 0.16);
+    }
+
+    .log-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4a496e;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 6px;
+    }
+
+    #log {
+      font-family: ui-monospace, Menlo, Consolas, "SF Mono";
+      font-size: 11px;
+      margin: 0;
+      max-height: 140px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #4a496e;
+    }
+
+    .alert {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #7c2d12;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 960px) {
+      body { padding: 12px; }
+      .page { gap: 14px; }
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .topbar {
+        border-radius: 18px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .topbar-right {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="logo-marker"></div>
+      <div class="brand-text">
+        <div class="brand-title">Income Tax Relief</div>
+        <div class="brand-sub">Private income check • public eligibility flag</div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="pill">
+          Network: <span id="networkLabel" class="mono">—</span>
+        </div>
+        <div class="pill">
+          Contract:
+          <span id="contractShort" class="mono"></span>
+        </div>
+        <button id="connectBtn" class="btn primary">Connect wallet</button>
+      </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <main class="layout">
+      <!-- LEFT: user flow -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Your application</div>
+            <div class="card-sub">
+              Submit your income privately. The contract evaluates eligibility on encrypted data.
+            </div>
+          </div>
+          <span id="policyBadge" class="badge-pill">Policy: unknown</span>
+        </div>
+
+        <div class="grid" style="margin-bottom: 8px;">
+          <div class="section-title">1. Enter your income</div>
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="field-label" for="incomeInput">
+                Annual income
+                <span class="badge">encrypted on submit</span>
+              </label>
+              <div class="input-shell">
+                <input
+                  id="incomeInput"
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 60000"
+                  inputmode="decimal"
+                />
+                <span class="unit">units</span>
+              </div>
+              <div class="small muted">
+                The unit (USD / EUR / wei) is defined by your off-chain convention. The contract only sees encrypted integers.
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Action</label>
+              <div class="grid" style="grid-template-columns: minmax(0, 1.2fr);">
+                <button id="submitBtn" class="btn primary">Encrypt &amp; submit</button>
+                <div id="submitStatus" class="small muted"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid">
+          <div class="section-title">2. Eligibility result</div>
+          <div class="stack-row">
+            <div class="eligibility-chip">
+              <div id="eligibilityDot" class="status-dot"></div>
+              <span id="eligibilityText">No decision yet</span>
+            </div>
+            <button id="refreshDecisionBtn" class="btn small">
+              Refresh decision
+            </button>
+          </div>
+          <div class="small muted">
+            Only the final eligibility flag is publicly decryptable. Your encrypted income remains private to you.
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid">
+          <div class="section-title">3. Handles (for advanced users)</div>
+
+          <div class="field">
+            <div class="field-label">Decision handle (public)</div>
+            <div class="handle-row">
+              <div class="handle-box">
+                <span id="decisionHandleText" class="mono handle-placeholder">
+                  no handle yet
+                </span>
+                <span id="decisionHandleBadge" class="badge-pill small">not decided</span>
+              </div>
+              <button id="copyDecisionBtn" class="btn small">Copy</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Income handle (private)</div>
+            <div class="handle-row">
+              <div class="handle-box">
+                <span id="incomeHandleText" class="mono handle-placeholder">
+                  no handle yet
+                </span>
+                <span id="incomeHandleBadge" class="badge-pill small">private</span>
+              </div>
+              <button id="decryptIncomeBtn" class="btn small">
+                Decrypt with signature
+              </button>
+            </div>
+            <div id="httpsWarning" class="alert" style="display:none;">
+              Signed decrypt requires HTTPS (or localhost with SSL). Only run this in a trusted environment.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: contract / tech panel + admin -->
+      <aside class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Technical panel</div>
+            <div class="card-sub">
+              Contract, addresses &amp; quick status of your application.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="section-title">Contract</div>
+          <div class="grid">
+            <div class="stack-row small">
+              <span class="muted">Address</span>
+              <span id="contractFull" class="mono"></span>
+            </div>
+            <div class="stack-row small">
+              <span class="muted">Owner</span>
+              <span id="ownerLabel" class="mono">—</span>
+            </div>
+            <div class="stack-row small">
+              <span class="muted">You</span>
+              <span id="accountLabel" class="mono">not connected</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section-title">Application state</div>
+          <div class="grid small">
+            <div class="stack-row">
+              <span class="muted">Application</span>
+              <span id="decidedLabel" class="badge-pill">not submitted</span>
+            </div>
+            <div class="stack-row">
+              <span class="muted">Last decision</span>
+              <span id="lastDecisionLabel">—</span>
+            </div>
+            <div class="stack-row">
+              <span class="muted">Relayer SDK</span>
+              <span id="relayerLabel">not initialized</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section-title">Admin • income policy</div>
+          <div class="grid small">
+            <div class="field">
+              <label class="field-label" for="policyInput">
+                Max annual income
+                <span class="badge">owner only</span>
+              </label>
+              <div class="input-shell">
+                <input
+                  id="policyInput"
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 50000"
+                  inputmode="decimal"
+                />
+                <span class="unit">units</span>
+              </div>
+            </div>
+            <div class="grid" style="grid-template-columns:minmax(0,1.2fr);">
+              <button id="setPolicyBtn" class="btn small">Encrypt &amp; set policy</button>
+              <div id="policyStatus" class="small muted"></div>
+            </div>
+            <div class="muted">
+              This sets the hidden maximum income threshold. Users cannot see or decrypt it.
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section-title">Quick actions</div>
+          <div class="grid small">
+            <button id="reloadBtn" class="btn small">Reload my state</button>
+            <div class="muted">
+              If you change accounts or switch networks, click “Reload” to re-sync your application data.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- LOG -->
+    <section class="log-card">
+      <div class="log-title">Event log</div>
+      <pre id="log"></pre>
+    </section>
+
+    <div class="footer-note">
+      Built on Zama FHEVM • Income check happens fully on encrypted data, only the tax relief decision is public.
+    </div>
+  </div>
+
+  <!-- Ethers v6 -->
+  <script type="module">
+    import {
+      BrowserProvider,
+      Contract
+    } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/dist/ethers.min.js";
+
+    // ========= BASIC CONFIG =========
+    const CONTRACT_ADDRESS = "0x2de52D78041736bFA3E3f4fb589C2c0A6C7b2261";
+    const CHAIN_ID_HEX = "0xaa36a7"; // Sepolia
+
+    const contractShortEl   = document.getElementById("contractShort");
+    const contractFullEl    = document.getElementById("contractFull");
+    const networkLabelEl    = document.getElementById("networkLabel");
+    const ownerLabelEl      = document.getElementById("ownerLabel");
+    const accountLabelEl    = document.getElementById("accountLabel");
+    const policyBadgeEl     = document.getElementById("policyBadge");
+    const relayerLabelEl    = document.getElementById("relayerLabel");
+    const decidedLabelEl    = document.getElementById("decidedLabel");
+    const lastDecisionLabelEl = document.getElementById("lastDecisionLabel");
+    const eligibilityDotEl  = document.getElementById("eligibilityDot");
+    const eligibilityTextEl = document.getElementById("eligibilityText");
+    const decisionHandleTextEl = document.getElementById("decisionHandleText");
+    const decisionHandleBadgeEl = document.getElementById("decisionHandleBadge");
+    const incomeHandleTextEl = document.getElementById("incomeHandleText");
+    const incomeHandleBadgeEl = document.getElementById("incomeHandleBadge");
+    const httpsWarningEl    = document.getElementById("httpsWarning");
+    const logEl             = document.getElementById("log");
+    const policyInputEl     = document.getElementById("policyInput");
+    const setPolicyBtn      = document.getElementById("setPolicyBtn");
+    const policyStatusEl    = document.getElementById("policyStatus");
+
+    const connectBtn        = document.getElementById("connectBtn");
+    const submitBtn         = document.getElementById("submitBtn");
+    const submitStatusEl    = document.getElementById("submitStatus");
+    const incomeInputEl     = document.getElementById("incomeInput");
+    const refreshDecisionBtn= document.getElementById("refreshDecisionBtn");
+    const copyDecisionBtn   = document.getElementById("copyDecisionBtn");
+    const decryptIncomeBtn  = document.getElementById("decryptIncomeBtn");
+    const reloadBtn         = document.getElementById("reloadBtn");
+
+    const IS_HTTPS = window.location.protocol === "https:";
+    if (!IS_HTTPS && window.location.hostname !== "localhost") {
+      httpsWarningEl.style.display = "block";
+      decryptIncomeBtn.disabled = true;
+    }
+
+    contractShortEl.textContent = shortAddress(CONTRACT_ADDRESS);
+    contractFullEl.textContent  = CONTRACT_ADDRESS;
+
+    function shortAddress(addr) {
+      if (!addr) return "—";
+      return addr.slice(0, 6) + "…" + addr.slice(-4);
+    }
+
+    function appendLog(...parts) {
+      const msg = parts
+        .map(x => (typeof x === "string" ? x : JSON.stringify(x)))
+        .join(" ");
+      logEl.textContent += msg + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log("[LOG]", ...parts);
+    }
+
+    function setEligibility(status, label) {
+      eligibilityDotEl.className = "status-dot";
+      if (status === "yes") eligibilityDotEl.classList.add("ok");
+      else if (status === "no") eligibilityDotEl.classList.add("no");
+      else if (status === "pending") eligibilityDotEl.classList.add("pending");
+      eligibilityTextEl.textContent = label;
+    }
+
+    function setPolicyInitialized(isInit) {
+      if (isInit) {
+        policyBadgeEl.textContent = "Policy: configured";
+        policyBadgeEl.style.background = "#ecfdf5";
+        policyBadgeEl.style.borderColor = "#bbf7d0";
+        policyBadgeEl.style.color = "#166534";
+      } else {
+        policyBadgeEl.textContent = "Policy: not set";
+        policyBadgeEl.style.background = "#fef2f2";
+        policyBadgeEl.style.borderColor = "#fecaca";
+        policyBadgeEl.style.color = "#b91c1c";
+      }
+    }
+
+    function setRelayerStatus(txt) {
+      relayerLabelEl.textContent = txt;
+    }
+
+    function setDecidedFlag(decided) {
+      decidedLabelEl.textContent = decided ? "decision stored" : "not submitted";
+      if (decided) {
+        decidedLabelEl.style.background = "#ecfdf5";
+        decidedLabelEl.style.borderColor = "#bbf7d0";
+        decidedLabelEl.style.color = "#166534";
+      } else {
+        decidedLabelEl.style.background = "#fef2f2";
+        decidedLabelEl.style.borderColor = "#fecaca";
+        decidedLabelEl.style.color = "#b91c1c";
+      }
+    }
+
+    function setDecisionHandle(handle, decided) {
+      if (!handle || handle === "0x" + "0".repeat(64)) {
+        decisionHandleTextEl.textContent = "no handle yet";
+        decisionHandleTextEl.classList.add("handle-placeholder");
+        decisionHandleBadgeEl.textContent = decided ? "empty" : "not decided";
+      } else {
+        decisionHandleTextEl.textContent = handle;
+        decisionHandleTextEl.classList.remove("handle-placeholder");
+        decisionHandleBadgeEl.textContent = "public";
+      }
+    }
+
+    function setIncomeHandle(handle, decided) {
+      if (!handle || handle === "0x" + "0".repeat(64)) {
+        incomeHandleTextEl.textContent = "no handle yet";
+        incomeHandleTextEl.classList.add("handle-placeholder");
+      } else {
+        incomeHandleTextEl.textContent = handle;
+        incomeHandleTextEl.classList.remove("handle-placeholder");
+      }
+      incomeHandleBadgeEl.textContent = decided ? "private" : "no data";
+    }
+
+    // ========= ABI (matches IncomeTaxReliefFHE) =========
+    const ABI = [
+      {
+        type: "function",
+        name: "owner",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ name: "", type: "address" }]
+      },
+      {
+        type: "function",
+        name: "transferOwnership",
+        stateMutability: "nonpayable",
+        inputs: [{ name: "newOwner", type: "address" }],
+        outputs: []
+      },
+      {
+        type: "function",
+        name: "policyInitialized",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ name: "", type: "bool" }]
+      },
+      {
+        type: "function",
+        name: "setIncomePolicy",
+        stateMutability: "nonpayable",
+        inputs: [
+          { name: "_maxAnnualIncome", type: "bytes32" },
+          { name: "proof", type: "bytes" }
+        ],
+        outputs: []
+      },
+      {
+        type: "function",
+        name: "submitIncome",
+        stateMutability: "nonpayable",
+        inputs: [
+          { name: "encAnnualIncome", type: "bytes32" },
+          { name: "proof", type: "bytes" }
+        ],
+        outputs: []
+      },
+      {
+        type: "function",
+        name: "getMyHandles",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [
+          { type: "bytes32" }, // income handle
+          { type: "bytes32" }, // decision handle
+          { type: "bool" }     // decided
+        ]
+      },
+      {
+        type: "function",
+        name: "getDecisionHandleOf",
+        stateMutability: "view",
+        inputs: [{ name: "who", type: "address" }],
+        outputs: [
+          { type: "bytes32" }, // decision handle
+          { type: "bool" }     // decided
+        ]
+      },
+      {
+        type: "function",
+        name: "getIncomeHandleOf",
+        stateMutability: "view",
+        inputs: [{ name: "who", type: "address" }],
+        outputs: [
+          { type: "bytes32" }, // income handle
+          { type: "bool" }     // decided
+        ]
+      }
+    ];
+
+    // ========= STATE =========
+    const state = {
+      provider: null,
+      signer: null,
+      contract: null,
+      fhe: null,
+      relayerSdk: null,
+      account: null,
+      owner: null
+    };
+
+    // ========= RELAYER SDK LOADER =========
+    async function loadRelayerSdk() {
+      const tries = [
+        "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js",
+        "https://cdn.jsdelivr.net/npm/@zama-fhe/relayer-sdk@0.3.0/dist/relayer-sdk-js.js",
+        "https://unpkg.com/@zama-fhe/relayer-sdk@0.3.0/dist/relayer-sdk-js.js"
+      ];
+      let lastErr = null;
+      for (const url of tries) {
+        try {
+          appendLog("Loading Relayer SDK from", url);
+          const mod = await import(url);
+          appendLog("Relayer SDK loaded");
+          return mod;
+        } catch (e) {
+          lastErr = e;
+          console.warn("SDK load failed", url, e);
+        }
+      }
+      throw lastErr || new Error("Unable to load Relayer SDK");
+    }
+
+    // ========= NETWORK HELPERS =========
+    function normalizeChainId(id) {
+      if (!id) return "";
+      const s = String(id);
+      if (/^\d+$/.test(s)) {
+        const n = BigInt(s);
+        return "0x" + n.toString(16);
+      }
+      return s.toLowerCase();
+    }
+
+    async function ensureSepolia() {
+      if (!window.ethereum?.request) return false;
+      const current = normalizeChainId(await window.ethereum.request({ method: "eth_chainId" }).catch(() => null));
+      networkLabelEl.textContent = current || "unknown";
+      if (current === CHAIN_ID_HEX) return true;
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: CHAIN_ID_HEX }]
+        });
+      } catch (e) {
+        if (e && e.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: CHAIN_ID_HEX,
+              chainName: "Sepolia",
+              nativeCurrency: { name: "Sepolia ETH", symbol: "SEP", decimals: 18 },
+              rpcUrls: ["https://rpc.sepolia.org"],
+              blockExplorerUrls: ["https://sepolia.etherscan.io"]
+            }]
+          });
+        } else {
+          throw e;
+        }
+      }
+      const after = normalizeChainId(await window.ethereum.request({ method: "eth_chainId" }));
+      networkLabelEl.textContent = after || "unknown";
+      return after === CHAIN_ID_HEX;
+    }
+
+    // ========= PUBLIC DECRYPT HELPERS =========
+    function buildValuePicker(out, pairs) {
+      let mapping = {};
+      const clear = out && out.clearValues;
+      if (Array.isArray(clear) && pairs && pairs.length) {
+        pairs.forEach((p, idx) => {
+          const h = (p.handle || p).toLowerCase();
+          mapping[h] = clear[idx];
+        });
+      }
+
+      if (!Object.keys(mapping).length && typeof out?.abiEncodedClearValues === "string") {
+        const hex = out.abiEncodedClearValues.startsWith("0x")
+          ? out.abiEncodedClearValues.slice(2)
+          : out.abiEncodedClearValues;
+        const vals = [];
+        for (let i = 0; i + 64 <= hex.length; i += 64) {
+          vals.push("0x" + hex.slice(i, i + 64));
+        }
+        pairs.forEach((p, idx) => {
+          const h = (p.handle || p).toLowerCase();
+          mapping[h] = vals[idx] || "0x0";
+        });
+      }
+
+      if (!Object.keys(mapping).length && out && typeof out === "object") {
+        mapping = out;
+      }
+
+      return (handle) => {
+        if (!handle) return null;
+        const k1 = String(handle);
+        const k2 = k1.toLowerCase();
+        let v = mapping[k2] ?? mapping[k1] ?? null;
+        try {
+          if (v == null) return null;
+          if (typeof v === "bigint" || typeof v === "number") return BigInt(v);
+          if (typeof v === "string") {
+            return v.startsWith("0x") ? BigInt(v) : BigInt(v);
+          }
+          return BigInt(v.toString());
+        } catch {
+          return null;
+        }
+      };
+    }
+
+    async function publicDecryptOne(handleHex) {
+      if (!state.fhe) throw new Error("Relayer SDK not initialized");
+      const pair = { handle: String(handleHex), contractAddress: CONTRACT_ADDRESS };
+      try {
+        const out = await state.fhe.publicDecrypt([pair]);
+        const pick = buildValuePicker(out, [pair]);
+        return pick(handleHex);
+      } catch (e1) {
+        console.warn("publicDecrypt with pairs failed, retry with handles only", e1);
+        const out2 = await state.fhe.publicDecrypt([String(handleHex)]);
+        const pick2 = buildValuePicker(out2, [handleHex]);
+        return pick2(handleHex);
+      }
+    }
+
+    // ========= SIGNED DECRYPT (income) =========
+    async function userDecryptOne(handleHex) {
+      if (!state.relayerSdk || !state.fhe || !state.signer) throw new Error("Missing SDK/signing context");
+      const { generateKeypair } = state.relayerSdk;
+      if (!generateKeypair) throw new Error("generateKeypair not available in this SDK build");
+      const kp = await generateKeypair();
+      const startTs = Math.floor(Date.now() / 1000).toString();
+      const daysValid = "7";
+
+      const eip = state.fhe.createEIP712(
+        kp.publicKey,
+        [CONTRACT_ADDRESS],
+        startTs,
+        daysValid
+      );
+
+      const sig = await state.signer.signTypedData(
+        eip.domain,
+        { UserDecryptRequestVerification: eip.types.UserDecryptRequestVerification },
+        eip.message
+      );
+
+      const pair = { handle: String(handleHex), contractAddress: CONTRACT_ADDRESS };
+      const out = await state.fhe.userDecrypt(
+        [pair],
+        kp.privateKey,
+        kp.publicKey,
+        sig.replace("0x", ""),
+        [CONTRACT_ADDRESS],
+        await state.signer.getAddress(),
+        startTs,
+        daysValid
+      );
+
+      const kLower = String(handleHex).toLowerCase();
+      let v = out[String(handleHex)] ?? out[kLower] ?? null;
+      if (v == null) throw new Error("userDecrypt returned empty result");
+      return BigInt(v);
+    }
+
+    // ========= CONNECT / DISCONNECT =========
+    connectBtn.addEventListener("click", async () => {
+      if (state.signer) {
+        await disconnectWallet();
+      } else {
+        await connectWallet();
+      }
+    });
+
+    async function connectWallet() {
+      try {
+        if (!window.ethereum?.request) {
+          alert("Please install MetaMask or a compatible wallet.");
+          return;
+        }
+        await ensureSepolia();
+
+        const provider = new BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const account = await signer.getAddress();
+
+        const contract = new Contract(CONTRACT_ADDRESS, ABI, signer);
+
+        // Load Relayer SDK
+        const sdk = await loadRelayerSdk();
+        if (sdk.initSDK) await sdk.initSDK();
+        const { createInstance, SepoliaConfig } = sdk;
+        const fheInstance = await createInstance(SepoliaConfig);
+
+        state.provider   = provider;
+        state.signer     = signer;
+        state.contract   = contract;
+        state.fhe        = fheInstance;
+        state.relayerSdk = sdk;
+        state.account    = account;
+
+        connectBtn.textContent = "Disconnect";
+        connectBtn.classList.remove("primary");
+        accountLabelEl.textContent = shortAddress(account);
+        setRelayerStatus("ready (Sepolia)");
+
+        try {
+          state.owner = await contract.owner();
+          const isOwner = state.owner && account && state.owner.toLowerCase() === account.toLowerCase();
+          ownerLabelEl.textContent = shortAddress(state.owner) + (isOwner ? " (you)" : "");
+        } catch {
+          ownerLabelEl.textContent = "—";
+        }
+
+        try {
+          const init = await contract.policyInitialized();
+          setPolicyInitialized(init);
+        } catch {
+          setPolicyInitialized(false);
+        }
+
+        appendLog("Connected as", account);
+        await reloadState();
+      } catch (e) {
+        console.error(e);
+        alert(e?.message || "Failed to connect");
+        appendLog("Connect failed:", e?.message || e);
+      }
+    }
+
+    async function disconnectWallet() {
+      state.provider = null;
+      state.signer = null;
+      state.contract = null;
+      state.fhe = null;
+      state.relayerSdk = null;
+      state.account = null;
+      state.owner = null;
+
+      connectBtn.textContent = "Connect wallet";
+      connectBtn.classList.add("primary");
+
+      accountLabelEl.textContent = "not connected";
+      ownerLabelEl.textContent = "—";
+      setRelayerStatus("not initialized");
+      setDecidedFlag(false);
+      setEligibility("pending", "No decision yet");
+      setDecisionHandle(null, false);
+      setIncomeHandle(null, false);
+      lastDecisionLabelEl.textContent = "—";
+      policyStatusEl.textContent = "";
+      setPolicyInitialized(false);
+
+      appendLog("Disconnected");
+    }
+
+    // ========= RELOAD STATE =========
+    reloadBtn.addEventListener("click", reloadState);
+
+    async function reloadState() {
+      try {
+        if (!state.contract || !state.signer) return;
+        const me = state.account || (await state.signer.getAddress());
+
+        const [incomeH, decisionH, decided] = await state.contract.getMyHandles();
+        const decidedBool = !!decided;
+
+        setDecidedFlag(decidedBool);
+        setDecisionHandle(decisionH, decidedBool);
+        setIncomeHandle(incomeH, decidedBool);
+
+        if (decidedBool && state.fhe) {
+          await refreshDecision();
+        } else {
+          setEligibility("pending", "No decision yet");
+          lastDecisionLabelEl.textContent = "—";
+        }
+
+        // also refresh policy flag
+        try {
+          const init = await state.contract.policyInitialized();
+          setPolicyInitialized(init);
+        } catch {}
+      } catch (e) {
+        console.error(e);
+        appendLog("reloadState error:", e?.message || e);
+      }
+    }
+
+    // ========= SUBMIT INCOME =========
+    submitBtn.addEventListener("click", async () => {
+      try {
+        if (!state.contract || !state.fhe || !state.signer) {
+          throw new Error("Connect wallet first");
+        }
+        submitStatusEl.textContent = "";
+
+        const raw = incomeInputEl.value.trim();
+        const val = Number(raw);
+        if (!Number.isFinite(val) || val < 0) {
+          throw new Error("Income must be a non-negative number");
+        }
+
+        appendLog("Encrypting income:", val);
+        const sender = await state.signer.getAddress();
+        const inputBuf = state.fhe.createEncryptedInput(CONTRACT_ADDRESS, sender);
+        inputBuf.add64(BigInt(Math.floor(val)));
+
+        const { handles, inputProof } = await inputBuf.encrypt();
+        appendLog("Encrypted handle:", handles[0]);
+
+        const tx = await state.contract.submitIncome(handles[0], inputProof);
+        submitStatusEl.textContent = `Transaction sent: ${tx.hash.slice(0,10)}…`;
+        appendLog("submitIncome tx:", tx.hash);
+
+        await tx.wait();
+        submitStatusEl.textContent = "Income submitted ✓";
+        appendLog("submitIncome confirmed");
+
+        await reloadState();
+      } catch (e) {
+        console.error(e);
+        const msg = e?.reason || e?.shortMessage || e?.message || String(e);
+        submitStatusEl.textContent = msg;
+        appendLog("submitIncome error:", msg);
+        alert(msg);
+      }
+    });
+
+    // ========= ADMIN: SET POLICY =========
+    setPolicyBtn.addEventListener("click", async () => {
+      try {
+        if (!state.contract || !state.fhe || !state.signer) {
+          throw new Error("Connect wallet first");
+        }
+        policyStatusEl.textContent = "";
+
+        const me = state.account || (await state.signer.getAddress());
+        if (!state.owner) {
+          throw new Error("Owner address not known (try reconnect)");
+        }
+        if (state.owner.toLowerCase() !== me.toLowerCase()) {
+          throw new Error("Only contract owner can set policy");
+        }
+
+        const raw = policyInputEl.value.trim();
+        const val = Number(raw);
+        if (!Number.isFinite(val) || val < 0) {
+          throw new Error("Max income must be a non-negative number");
+        }
+
+        appendLog("Encrypting policy max income:", val);
+        policyStatusEl.textContent = "Encrypting & sending…";
+
+        const buf = state.fhe.createEncryptedInput(CONTRACT_ADDRESS, me);
+        buf.add64(BigInt(Math.floor(val)));
+        const { handles, inputProof } = await buf.encrypt();
+
+        appendLog("Policy encrypted handle:", handles[0]);
+        const tx = await state.contract.setIncomePolicy(handles[0], inputProof);
+        policyStatusEl.textContent = `Tx: ${tx.hash.slice(0,10)}…`;
+        appendLog("setIncomePolicy tx:", tx.hash);
+
+        await tx.wait();
+        policyStatusEl.textContent = "Policy updated ✓";
+        setPolicyInitialized(true);
+        appendLog("setIncomePolicy confirmed");
+      } catch (e) {
+        console.error(e);
+        const msg = e?.reason || e?.shortMessage || e?.message || String(e);
+        policyStatusEl.textContent = msg;
+        appendLog("setIncomePolicy error:", msg);
+        alert(msg);
+      }
+    });
+
+    // ========= DECISION REFRESH / PUBLIC DECRYPT =========
+    refreshDecisionBtn.addEventListener("click", async () => {
+      await refreshDecision();
+    });
+
+    async function refreshDecision() {
+      try {
+        if (!state.contract || !state.fhe || !state.signer) {
+          throw new Error("Connect wallet first");
+        }
+        const me = state.account || (await state.signer.getAddress());
+        const [decHandle, decided] = await state.contract.getDecisionHandleOf(me);
+        setDecisionHandle(decHandle, decided);
+
+        if (!decided) {
+          setEligibility("pending", "No decision yet");
+          lastDecisionLabelEl.textContent = "—";
+          return;
+        }
+
+        appendLog("publicDecrypt decision handle:", decHandle);
+        const v = await publicDecryptOne(decHandle);
+        if (v == null) throw new Error("publicDecrypt returned null");
+        const isEligible = BigInt(v) !== 0n;
+
+        setEligibility(isEligible ? "yes" : "no", isEligible ? "Eligible for tax relief" : "Not eligible");
+        lastDecisionLabelEl.textContent = isEligible ? "eligible" : "not eligible";
+        appendLog("Decision decrypted:", isEligible);
+      } catch (e) {
+        console.error(e);
+        appendLog("refreshDecision error:", e?.message || e);
+        alert(e?.message || "Failed to refresh decision");
+      }
+    }
+
+    // ========= COPY DECISION HANDLE =========
+    copyDecisionBtn.addEventListener("click", async () => {
+      const txt = decisionHandleTextEl.textContent || "";
+      if (!txt || txt === "no handle yet") return;
+      try {
+        await navigator.clipboard.writeText(txt);
+        copyDecisionBtn.textContent = "Copied";
+        setTimeout(() => (copyDecisionBtn.textContent = "Copy"), 900);
+      } catch {
+        alert("Failed to copy");
+      }
+    });
+
+    // ========= SIGNED DECRYPT (INCOME) BUTTON =========
+    decryptIncomeBtn.addEventListener("click", async () => {
+      try {
+        if (!IS_HTTPS && window.location.hostname !== "localhost") {
+          throw new Error("Signed decrypt only allowed over HTTPS / localhost");
+        }
+        if (!state.contract || !state.fhe || !state.signer) {
+          throw new Error("Connect wallet first");
+        }
+        const [incomeH, , decided] = await state.contract.getMyHandles();
+        if (!decided) throw new Error("No application stored yet");
+        if (!incomeH || incomeH === "0x" + "0".repeat(64)) {
+          throw new Error("No income handle");
+        }
+
+        appendLog("userDecrypt income handle:", incomeH);
+        const v = await userDecryptOne(incomeH);
+        appendLog("Income decrypted:", v.toString());
+        alert("Your decrypted income (uint64): " + v.toString());
+      } catch (e) {
+        console.error(e);
+        appendLog("decryptIncome error:", e?.message || e);
+        alert(e?.message || "Failed to decrypt income");
+      }
+    });
+
+    // ========= AUTO CONNECT IF AUTHORIZED =========
+    if (window.ethereum) {
+      window.ethereum.on?.("accountsChanged", () => {
+        window.location.reload();
+      });
+      window.ethereum.on?.("chainChanged", () => {
+        window.location.reload();
+      });
+
+      (async () => {
+        try {
+          const accounts = await window.ethereum.request({ method: "eth_accounts" });
+          if (accounts && accounts.length) {
+            appendLog("Wallet already authorized, auto-connecting…");
+            await connectWallet();
+          }
+        } catch (e) {
+          console.warn("Auto connect failed", e);
+        }
+      })();
+    }
+  </script>
+</body>
+</html>

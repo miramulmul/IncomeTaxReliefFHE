@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true, // позволяем .js-файлы
+    "checkJs": false, // не проверять их типы жестко
+    "noEmit": true // не эмитить никакие .js из .ts
+  },
+  "include": [
+    "src/**/*.js",
+    "src/shims/**/*.js", // ваш buffer-shim
+    "src/**/*.ts",
+    "../server/**/*.ts",
+    "../test/**/*.ts",
+    "src/po",
+    "src/main",
+    "src/globals.d."
+  ]
+}
